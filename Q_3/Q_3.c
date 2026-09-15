@@ -6,31 +6,40 @@
 #define M 3
 #define TAM_ARRAY 10
 
+typedef int semaphore;
+
 int arr[TAM_ARRAY];
-bool trava = false;
-pthread_mutex_t mymutex = PTHREAD_MUTEX_INITIALIZER;
+semaphore reader_sem = 1, writer_sem = 1;
+int reader_count = 0;
 
 void* Ler(void* threadid){
-    if(!trava) {
-        for(int i = 0; i < TAM_ARRAY; i++){
-            printf("%d ", arr[i]);
-        }
-        printf("\n");
-    } else {
-        printf("Aguardando a escrita...\n");
+    while(true){
+        down(&reader_sem);
+        reader_count++;
+        if(reader_count == 1){down(&writer_sem);}
+        up(&reader_sem);
+        int i = rand() % TAM_ARRAY;
+        printf("Thread L%ld leu arr[%d] = %d\n", threadid, i, arr[i]);
+        down(&reader_sem);
+        reader_count--;
+        if(reader_count == 0){up(&writer_sem);}
+        up(&reader_sem);
     }
-    return NULL;
+        
+    pthread_exit(NULL);
 }
 
 void* Escrever(void* threadid){
-    trava = true;
-    pthread_mutex_lock(&mymutex);
-    for(int i = 0; i < TAM_ARRAY; i++){
-        arr[i] = rand() % 100;
+    while(true){
+        down(&writer_sem);
+        int i = rand() % TAM_ARRAY;
+        int value = rand() % 100;
+        arr[i] = value;
+        printf("Thread E%ld escreveu arr[%d] = %d\n", threadid, i, arr[i]);
+        up(&writer_sem);
     }
-    pthread_mutex_unlock(&mymutex);
-    trava = false;
-    return NULL;
+
+    pthread_exit(NULL);
 }
 
 int main(int argc, char *argv[]){
@@ -38,14 +47,14 @@ int main(int argc, char *argv[]){
     pthread_t threads_escritor[M];
 
     for(int i = 0; i < N; i++){
-        int rc = pthread_create(&threads_leitor[i], NULL, Ler, NULL);
+        int rc = pthread_create(&threads_leitor[i], NULL, Ler, (void*)(i+1));
         if(rc){
             printf("ERRO; código de retorno é %d\n", rc);
             exit(1);
         }
     }
     for(int i = 0; i < M; i++){
-        int rc = pthread_create(&threads_escritor[i], NULL, Escrever, NULL);
+        int rc = pthread_create(&threads_escritor[i], NULL, Escrever, (void*)(i+1));
         if(rc){
             printf("ERRO; código de retorno é %d\n", rc);
             exit(1);
@@ -57,5 +66,6 @@ int main(int argc, char *argv[]){
     for(int i = 0; i < M; i++){
         pthread_join(threads_escritor[i], NULL);
     }
-    return 0;
+    
+    pthread_exit(NULL);
 }
