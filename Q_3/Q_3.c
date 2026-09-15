@@ -16,13 +16,19 @@ void* Ler(void* threadid){
     while(true){
         down(&reader_sem);
         reader_count++;
-        if(reader_count == 1){down(&writer_sem);}
+        if(reader_count == 1){
+            down(&writer_sem);
+        }
         up(&reader_sem);
+
         int i = rand() % TAM_ARRAY;
         printf("Thread L%ld leu arr[%d] = %d\n", threadid, i, arr[i]);
+
         down(&reader_sem);
         reader_count--;
-        if(reader_count == 0){up(&writer_sem);}
+        if(reader_count == 0){
+            up(&writer_sem);
+        }
         up(&reader_sem);
     }
         
@@ -66,6 +72,6 @@ int main(int argc, char *argv[]){
     for(int i = 0; i < M; i++){
         pthread_join(threads_escritor[i], NULL);
     }
-    
+
     pthread_exit(NULL);
 }
