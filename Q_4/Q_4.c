@@ -1,6 +1,7 @@
 // Questão 4
 #include <pthread.h>
 
+// Definições de constantes: Quantidade de soluções, número de iterações e número de threads
 #define QTD_SOL 4
 #define ITERACOES 10
 #define N_THREADS 4
@@ -104,13 +105,16 @@ int main(){
         dados[i].id = i;
         inicio = dados[i].fim;
 
+        // Cria a thread
         pthread_create(&threads[i], NULL, jacobi, &dados[i]);
     }
 
+    // Espera todas as threads terminarem.
     for(int i = 0; i < N_THREADS; i++){
         pthread_join(threads[i], NULL);
     }
 
+    // Finaliza a barreira
     pthread_barrier_destroy(&barreira);
 
     return 0;

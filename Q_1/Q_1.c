@@ -1,6 +1,4 @@
-// Questão 3
-#include <stdio.h>
-#include <stdlib.h>
+// Questão 1
 #include <pthread.h>
 
 #define TAM_VETOR 10
@@ -70,8 +68,6 @@ int main() {
     for(int i = 0; i < N_THREADS; i++) {
         soma_total += soma_parcial[i];
     }
-
-    printf("\nSoma final: %lld\n", soma_total);
 
     pthread_exit(NULL);
 }

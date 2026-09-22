@@ -1,0 +1,3 @@
+Hal 6
+Mica 2
+Galena 5
