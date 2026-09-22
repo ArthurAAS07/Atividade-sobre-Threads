@@ -44,6 +44,7 @@ int main() {
     // Criação das threads
     for(int i = 0; i < N_THREADS; i++) {
 
+        // Define o intervalo de elementos que cada thread irá somar
         dados[i].inicio = i * tamanho_bloco;
         
         // A última thread pega possíveis elementos restantes.
@@ -53,6 +54,7 @@ int main() {
             dados[i].fim = (i+1) * tamanho_bloco;
         }
 
+        // Define o ID da thread e cria a thread
         dados[i].id = i;
         pthread_create(&threads[i], NULL, somar, &dados[i]);
     }

@@ -84,7 +84,6 @@ int main(){
     }
 
     //    Inicializa a barreira.
-    //    N threads + thread principal
     pthread_barrier_init(&barreira, NULL, N_THREADS);
 
     int quantidade = QTD_SOL / N_THREADS;
